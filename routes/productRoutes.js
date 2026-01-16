@@ -53,4 +53,42 @@ router.delete('/products/:id', async (req, res) => {
     }
 });
 
+router.get('/products', async (req, res) => {
+    try {
+        const filter = {};
+        let sortOptions = {};
+        const { category, minPrice, maxPrice, sortBy, page = 1, limit = 10, inStock } = req.query;
+
+        if (category) {
+            filter.category = category;
+        };
+
+        if (minPrice || maxPrice) {
+            filter.price = {};
+            if (minPrice) filter.price.$gte = Number(minPrice);
+            if (maxPrice) filter.price.$lte = Number(maxPrice);
+        }
+
+        if (sortBy) {
+            const sortParams = sortBy.split(':');
+            const sortField = sortParams[0];
+            const sortOrder = sortParams[1] === 'desc' ? -1 : 1;
+            sortOptions = { [sortField]: sortOrder };
+        }
+
+        if (inStock) {
+            filter.inStock = inStock === 'true';
+        }
+
+        const products = await Product.find(filter)
+            .sort(sortOptions || {})
+            .skip((page - 1) * limit)
+            .limit(Number(limit));
+
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;
