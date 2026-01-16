@@ -3,20 +3,20 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
+        required: [true, 'Product name is required!'],
     },
     description: {
         type: String,
-        required: true,
+        required: [true, 'Product description is required!'],
     },
     price: {
         type: Number,
-        required: true,
-        min: 1
+        required: [true, 'Product price is required!'],
+        min: [1, 'Price must be greater than 0!' ],
     },
     category: {
         type: String,
-        required: true,
+        required: [true, 'Product category is required!'],
     },
     inStock: {
         type: Boolean,
